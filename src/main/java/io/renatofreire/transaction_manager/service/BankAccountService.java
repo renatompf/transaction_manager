@@ -67,13 +67,12 @@ public class BankAccountService {
         return BankAccountMapper.INSTANCE.toDTOOut(bankAccountById);
     }
 
-    public boolean deleteAccountById(Long id){
+    public void deleteAccountById(Long id){
         BankAccount bankAccountById = bankAccountRepository.findByIdAndDeletedIsFalse(id).orElseThrow(() -> new EntityNotFoundException(String.format("Bank account with id %s does not exist", id)));
 
         bankAccountById.setDeleted(true);
         bankAccountRepository.save(bankAccountById);
         logger.info("Bank account with id {} deleted", id);
-        return true;
     }
 
 }

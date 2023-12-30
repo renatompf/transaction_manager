@@ -35,8 +35,9 @@ public class BankAccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deleteBankAccountById(@PathVariable("id") Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(bankAccountService.deleteAccountById(id));
+    public ResponseEntity<Void> deleteBankAccountById(@PathVariable("id") Long id) {
+        bankAccountService.deleteAccountById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

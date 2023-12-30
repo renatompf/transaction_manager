@@ -208,7 +208,7 @@ public class AccountControllerTest {
 
         mockMvc.perform(delete("/accounts/{id}", accountDTO.id())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
     }
 

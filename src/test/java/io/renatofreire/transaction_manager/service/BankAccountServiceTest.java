@@ -222,9 +222,9 @@ public class BankAccountServiceTest {
         when(bankAccountRepository.findByIdAndDeletedIsFalse(accountId)).thenReturn(Optional.of(mockAccount));
 
         // Then
-        boolean isDeleted = bankAccountService.deleteAccountById(accountId);
+        bankAccountService.deleteAccountById(accountId);
 
-        assertThat(isDeleted).isTrue();
+        verify(bankAccountRepository, times(1)).save(any());
     }
 
     @Test

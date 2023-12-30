@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AccountServiceTest {
 
@@ -156,9 +156,10 @@ public class AccountServiceTest {
         when(accountRepository.findByIdAndDeletedIsFalse(accountId)).thenReturn(Optional.of(mockAccount));
 
         // Then
-        boolean isDeleted = accountService.deleteAccountById(accountId);
+        accountService.deleteAccountById(accountId);
 
-        assertThat(isDeleted).isTrue();
+        verify(accountRepository, times(1)).save(any());
+        verify(bankAccountRepository, times(1)).saveAll(any());
     }
 
     @Test
