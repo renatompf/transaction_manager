@@ -50,7 +50,7 @@ public class TransactionService {
         return TransactionMapper.INSTANCE.toDTOOut(transactionById);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public TransactionDTO createNewTransaction(CreateNewTransactionRequest request) {
         // Check if "from" and "to" are not the same bank account id
         if (request.from().equals(request.to())) {
