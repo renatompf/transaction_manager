@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class BankAccountServiceTest {
     void itShould_CreateBankAccount() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
 
         Account ownerAccount = new Account(
                 "John",
@@ -74,7 +75,7 @@ public class BankAccountServiceTest {
     void itShould_Not_CreateBankAccount_If_BalanceIsNegative() {
         // Given
         long ownerId = 1L;
-        double balance = -100d;
+        BigDecimal balance = BigDecimal.valueOf(-100d);
 
         Account ownerAccount = new Account(
                 "John",
@@ -99,7 +100,7 @@ public class BankAccountServiceTest {
     void itShould_Not_CreateBankAccount_If_CurrencyDoesNotExist() {
         // Given
         long ownerId = 1L;
-        double balance = 100d;
+        BigDecimal balance = BigDecimal.valueOf(100d);
 
         Account ownerAccount = new Account(
                 "John",
@@ -124,7 +125,7 @@ public class BankAccountServiceTest {
     void itShould_Not_CreateBankAccount_If_OwnerIdNotPresent() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
 
         Account ownerAccount = new Account(
                 "John",
@@ -150,7 +151,7 @@ public class BankAccountServiceTest {
     void itShould_Not_CreateBankAccount_If_OwnerAccountNotFound() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
 
         CreateBankAccountRequest request = new CreateBankAccountRequest(Currencies.EUR.name(), balance, ownerId);
 
@@ -168,7 +169,7 @@ public class BankAccountServiceTest {
         // Given
         long accountId = 1L;
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
 
         Account ownerAccount = new Account(
                 "John",
@@ -208,7 +209,7 @@ public class BankAccountServiceTest {
         // Given
         long ownerId = 1L;
         long accountId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",

@@ -25,6 +25,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
@@ -124,8 +125,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +146,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         ExchangeRateAPIResponse exchangeRateResponse = new ExchangeRateAPIResponse(
@@ -179,12 +180,12 @@ public class TransactionControllerTest {
         mockMvc.perform(get("/bank-accounts/{id}", fromBankAccountDTO.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance()-amountToTransfer));
+                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance().subtract(amountToTransfer)));
 
         mockMvc.perform(get("/bank-accounts/{id}", toBankAccountDTO.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance()+(amountToTransfer*createdTransaction.exchangeRate())));
+                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance().add(amountToTransfer.multiply(createdTransaction.exchangeRate())).doubleValue()));
 
     }
 
@@ -213,8 +214,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -234,7 +235,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         MvcResult transactionResult = mockMvc.perform(post("/transactions")
@@ -249,12 +250,12 @@ public class TransactionControllerTest {
         mockMvc.perform(get("/bank-accounts/{id}", fromBankAccountDTO.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance()-amountToTransfer));
+                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance().subtract(amountToTransfer)));
 
         mockMvc.perform(get("/bank-accounts/{id}", toBankAccountDTO.id())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance()+(amountToTransfer*createdTransaction.exchangeRate())));
+                .andExpect(jsonPath("$.balance").value(fromBankAccountDTO.balance().add(amountToTransfer.multiply(createdTransaction.exchangeRate())).doubleValue()));
     }
 
     @Test
@@ -274,7 +275,7 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -286,7 +287,7 @@ public class TransactionControllerTest {
         BankAccountDTO fromBankAccountDTO = objectMapper.readValue(fromBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), fromBankAccountDTO.id(), amountToTransfer);
 
         mockMvc.perform(post("/transactions")
@@ -321,8 +322,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -342,7 +343,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 10000d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(10000d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         mockMvc.perform(post("/transactions")
@@ -369,7 +370,7 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -381,7 +382,7 @@ public class TransactionControllerTest {
         BankAccountDTO fromBankAccountDTO = objectMapper.readValue(fromBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 10000d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(10000d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), 2L, amountToTransfer);
 
         mockMvc.perform(post("/transactions")
@@ -416,8 +417,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -437,7 +438,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         server.enqueue(new MockResponse().setResponseCode(400));
@@ -477,8 +478,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -498,7 +499,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         ExchangeRateAPIResponse exchangeRateResponse = new ExchangeRateAPIResponse(
@@ -553,8 +554,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -574,7 +575,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         ExchangeRateAPIResponse exchangeRateResponse = new ExchangeRateAPIResponse(
@@ -628,8 +629,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -649,7 +650,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         ExchangeRateAPIResponse exchangeRateResponse = new ExchangeRateAPIResponse(
@@ -716,8 +717,8 @@ public class TransactionControllerTest {
 
         //Create Bank Accounts (One for each account)
         String baseCurrency = Currencies.USD.name();
-        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, 1000d, fromAccountDTO.id());
-        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), 1000d, toAccountDTO.id());
+        CreateBankAccountRequest createFromBankAccountRequest = new CreateBankAccountRequest(baseCurrency, BigDecimal.valueOf(1000d), fromAccountDTO.id());
+        CreateBankAccountRequest createToBankAccountRequest = new CreateBankAccountRequest(Currencies.EUR.name(), BigDecimal.valueOf(1000d), toAccountDTO.id());
 
         MvcResult fromBankAccountResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -737,7 +738,7 @@ public class TransactionControllerTest {
         BankAccountDTO toBankAccountDTO = objectMapper.readValue(toBankAccountResult.getResponse().getContentAsString(), BankAccountDTO.class);
 
         // Create transaction request
-        double amountToTransfer = 100d;
+        BigDecimal amountToTransfer = BigDecimal.valueOf(100d);
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(fromBankAccountDTO.id(), toBankAccountDTO.id(), amountToTransfer);
 
         ExchangeRateAPIResponse exchangeRateResponse = new ExchangeRateAPIResponse(

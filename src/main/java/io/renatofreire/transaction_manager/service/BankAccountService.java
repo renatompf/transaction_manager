@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 public class BankAccountService {
 
@@ -32,7 +34,7 @@ public class BankAccountService {
 
     public BankAccountDTO createBankAccount(CreateBankAccountRequest request){
         // Check if the balance is negative
-        if (request.balance() != null && request.balance() < 0) {
+        if (request.balance() != null && request.balance().signum() == -1) {
             throw new NotPossibleCreateBankAccountException("Balance cannot be negative at the moment of account creation");
         }
 
@@ -49,7 +51,7 @@ public class BankAccountService {
 
         Account ownerAccount = accountRepository.findByIdAndDeletedIsFalse(request.ownerId()).orElseThrow(() -> new EntityNotFoundException(String.format("User with id %s not found", request.ownerId())));
 
-        BankAccount bankAccount = new BankAccount(ownerAccount, currency, request.balance() == null ? 0 : request.balance());
+        BankAccount bankAccount = new BankAccount(ownerAccount, currency, request.balance() == null ? BigDecimal.valueOf(0) : request.balance());
 
         BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
 

@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -149,7 +150,7 @@ public class AccountServiceTest {
                 LocalDate.of(1995, 5, 15)
         );
 
-        BankAccount mockBankAccount = new BankAccount(mockAccount, Currencies.EUR, 5000d);
+        BankAccount mockBankAccount = new BankAccount(mockAccount, Currencies.EUR, BigDecimal.valueOf(5000d));
 
         // When
         when(bankAccountRepository.findAllByOwnerId(accountId)).thenReturn(List.of(mockBankAccount));

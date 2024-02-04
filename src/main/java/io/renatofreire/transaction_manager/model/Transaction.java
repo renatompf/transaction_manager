@@ -4,6 +4,7 @@ package io.renatofreire.transaction_manager.model;
 import io.renatofreire.transaction_manager.enums.Currencies;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -28,10 +29,10 @@ public class Transaction {
     private Currencies toCurrency;
 
     @Column(name = "original_amount")
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(name = "exchange_rate")
-    private Double exchangeRate;
+    private BigDecimal exchangeRate;
 
     @Column(name = "timestamp")
     private ZonedDateTime timestamp;
@@ -39,7 +40,7 @@ public class Transaction {
     public Transaction () {
     }
 
-    public Transaction(BankAccount fromAccount, BankAccount toAccount, Double amount, Double exchangeRate, ZonedDateTime timestamp) {
+    public Transaction(BankAccount fromAccount, BankAccount toAccount, BigDecimal amount, BigDecimal exchangeRate, ZonedDateTime timestamp) {
         this.fromAccount = fromAccount;
         this.toAccount = toAccount;
         this.fromCurrency = fromAccount.getCurrency();
@@ -89,19 +90,19 @@ public class Transaction {
         this.toCurrency = toCurrency;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public Double getExchangeRate() {
+    public BigDecimal getExchangeRate() {
         return exchangeRate;
     }
 
-    public void setExchangeRate(Double exchangeRate) {
+    public void setExchangeRate(BigDecimal exchangeRate) {
         this.exchangeRate = exchangeRate;
     }
 

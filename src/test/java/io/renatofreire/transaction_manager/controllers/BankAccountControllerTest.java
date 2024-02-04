@@ -23,6 +23,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -90,7 +91,7 @@ public class BankAccountControllerTest {
 
         AccountDTO accountDTO = objectMapper.readValue(result.getResponse().getContentAsString(), AccountDTO.class);
 
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", 1000d, accountDTO.id());
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(1000d), accountDTO.id());
 
         // When
         // Then
@@ -106,7 +107,7 @@ public class BankAccountControllerTest {
     void itShould_Not_CreateBankAccount_IfBalanceIsNegative() throws Exception {
         // Given
 
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", -1000d, 1L);
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(-1000d), 1L);
 
         // When
         // Then
@@ -120,7 +121,7 @@ public class BankAccountControllerTest {
     @Test
     void itShould_Not_CreateBankAccount_IfCurrencyDoesNotExists() throws Exception {
         // Given
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("RMF", 1000d, 1L);
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("RMF", BigDecimal.valueOf(1000d), 1L);
 
         // When
         // Then
@@ -134,7 +135,7 @@ public class BankAccountControllerTest {
     @Test
     void itShould_Not_CreateBankAccount_IfOwnerAccountNotPresent() throws Exception {
         // Given
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", 1000d, 1000000L);
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(1000d), 1000000L);
 
         // When
         // Then
@@ -159,7 +160,7 @@ public class BankAccountControllerTest {
 
         AccountDTO accountDTO = objectMapper.readValue(result.getResponse().getContentAsString(), AccountDTO.class);
 
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", 1000d, accountDTO.id());
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(1000d), accountDTO.id());
 
         mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -205,7 +206,7 @@ public class BankAccountControllerTest {
 
         AccountDTO accountDTO = objectMapper.readValue(accountCreationResult.getResponse().getContentAsString(), AccountDTO.class);
 
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", 1000d, accountDTO.id());
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(1000d), accountDTO.id());
 
         MvcResult bankAccountCreationResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -253,7 +254,7 @@ public class BankAccountControllerTest {
 
         AccountDTO accountDTO = objectMapper.readValue(accountCreationResult.getResponse().getContentAsString(), AccountDTO.class);
 
-        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", 1000d, accountDTO.id());
+        CreateBankAccountRequest createBankAccountRequest = new CreateBankAccountRequest("EUR", BigDecimal.valueOf(1000d), accountDTO.id());
 
         MvcResult bankAccountCreationResult = mockMvc.perform(post("/bank-accounts")
                         .contentType(MediaType.APPLICATION_JSON)

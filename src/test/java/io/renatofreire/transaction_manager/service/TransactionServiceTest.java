@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class TransactionServiceTest {
     void itShould_GetTransactionById() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -65,7 +66,7 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.USD, balance);
 
         Long transactionId = 1L;
-        Transaction expected = new Transaction(fromBankAccount, toBankAccount, 100d, 0.01, ZonedDateTime.now());
+        Transaction expected = new Transaction(fromBankAccount, toBankAccount, BigDecimal.valueOf(100d), BigDecimal.valueOf(0.01), ZonedDateTime.now());
 
         // When
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(expected));
@@ -95,7 +96,7 @@ public class TransactionServiceTest {
     void itShould_CreateNewTransaction_DifferentCurrencies() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -108,9 +109,9 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.USD, balance);
         toBankAccount.setId(2L);
 
-        Transaction expected = new Transaction(fromBankAccount, toBankAccount, 100d, 0.82, ZonedDateTime.now());
+        Transaction expected = new Transaction(fromBankAccount, toBankAccount, BigDecimal.valueOf(100d), BigDecimal.valueOf(0.82), ZonedDateTime.now());
 
-        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, 100d);
+        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, BigDecimal.valueOf(100d));
 
         ExchangeRateAPIResponse mockedExchangeRateResponse = new ExchangeRateAPIResponse(
                 "success",
@@ -142,7 +143,7 @@ public class TransactionServiceTest {
     void itShould_Not_CreateNewTransaction_DifferentCurrencies_IfResponseBodyDoesNotContainsRates() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -155,7 +156,7 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.USD, balance);
         toBankAccount.setId(2L);
 
-        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, 100d);
+        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, BigDecimal.valueOf(100d));
 
         ExchangeRateAPIResponse mockedExchangeRateResponse = new ExchangeRateAPIResponse(
                 "success",
@@ -184,7 +185,7 @@ public class TransactionServiceTest {
     void itShould_Not_CreateNewTransaction_DifferentCurrencies_IfRatesNotContainsToBankAccountCurrency() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -197,9 +198,9 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.USD, balance);
         toBankAccount.setId(2L);
 
-        Transaction expected = new Transaction(fromBankAccount, toBankAccount, 100d, 0.82, ZonedDateTime.now());
+        Transaction expected = new Transaction(fromBankAccount, toBankAccount, BigDecimal.valueOf(100d), BigDecimal.valueOf(0.82), ZonedDateTime.now());
 
-        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, 100d);
+        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, BigDecimal.valueOf(100d));
 
         ExchangeRateAPIResponse mockedExchangeRateResponse = new ExchangeRateAPIResponse(
                 "success",
@@ -228,7 +229,7 @@ public class TransactionServiceTest {
     void itShould_CreateNewTransaction_SameCurrencies() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -241,9 +242,9 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.EUR, balance);
         toBankAccount.setId(2L);
 
-        Transaction expected = new Transaction(fromBankAccount, toBankAccount, 100d, 0.82, ZonedDateTime.now());
+        Transaction expected = new Transaction(fromBankAccount, toBankAccount, BigDecimal.valueOf(100d), BigDecimal.valueOf(0.82), ZonedDateTime.now());
 
-        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, 100d);
+        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, BigDecimal.valueOf(100d));
 
         // When
         when(bankAccountRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(fromBankAccount));
@@ -261,7 +262,7 @@ public class TransactionServiceTest {
     void itShould_Not_CreateNewTransaction_IfNotEnoughBalance() {
         // Given
         long ownerId = 1L;
-        double balance = 10000d;
+        BigDecimal balance = BigDecimal.valueOf(10000d);
         Account ownerAccount = new Account(
                 "John",
                 "Doe",
@@ -274,7 +275,7 @@ public class TransactionServiceTest {
         BankAccount toBankAccount = new BankAccount(ownerAccount, Currencies.USD, balance);
         toBankAccount.setId(2L);
 
-        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, 100000d);
+        CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(1L, 2L, BigDecimal.valueOf(100000d));
 
         // When
         when(bankAccountRepository.findByIdAndDeletedIsFalse(1L)).thenReturn(Optional.of(fromBankAccount));
@@ -290,7 +291,7 @@ public class TransactionServiceTest {
     void itShould_Not_CreateNewTransaction_IfTransactionIsMadeToSameBankAccount() {
         // Given
         long bankAccountId = 1L;
-        double balance = 1000d;
+        BigDecimal balance = BigDecimal.valueOf(1000d);
 
         CreateNewTransactionRequest createNewTransactionRequest = new CreateNewTransactionRequest(bankAccountId, bankAccountId, balance);
 

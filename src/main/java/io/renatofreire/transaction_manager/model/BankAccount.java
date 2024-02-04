@@ -3,6 +3,8 @@ package io.renatofreire.transaction_manager.model;
 import io.renatofreire.transaction_manager.enums.Currencies;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "bank_account")
 public class BankAccount {
@@ -20,7 +22,7 @@ public class BankAccount {
     private Currencies currency;
 
     @Column(name = "balance", nullable = false)
-    private Double balance;
+    private BigDecimal balance;
 
     @Column(name = "deleted")
     private boolean deleted;
@@ -28,7 +30,7 @@ public class BankAccount {
     public BankAccount () {
     }
 
-    public BankAccount(Account owner, Currencies currency, Double balance) {
+    public BankAccount(Account owner, Currencies currency, BigDecimal balance) {
         this.owner = owner;
         this.currency = currency;
         this.balance = balance;
@@ -59,11 +61,11 @@ public class BankAccount {
         this.currency = currency;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

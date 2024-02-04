@@ -1,8 +1,10 @@
 package io.renatofreire.transaction_manager.dto;
 
+import java.math.BigDecimal;
+
 public record CreateBankAccountRequest(
     String currency,
-    Double balance,
+    BigDecimal balance,
     Long ownerId
 ) {
 }

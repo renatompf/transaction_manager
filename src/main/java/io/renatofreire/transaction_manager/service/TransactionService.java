@@ -16,8 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -60,16 +62,16 @@ public class TransactionService {
         BankAccount toBankAccount = bankAccountRepository.findByIdAndDeletedIsFalse(request.to()).orElseThrow(() -> new EntityNotFoundException(String.format("Account with id %s does not exist", request.from())));
 
         // Check if "from" bank account has enough balance
-        if (fromBankAccount.getBalance() - request.amount() < 0) {
+        if (fromBankAccount.getBalance().subtract(request.amount()).signum() == -1) {
             throw new ImpossibleToRealiseTransactionException("There is no enough balance in the account to make the transaction");
         }
 
-        Double exchangeRate;
+        BigDecimal exchangeRate;
 
         // If both accounts use the same currency, there's no need to check the exchange rate
         if (fromBankAccount.getCurrency().equals(toBankAccount.getCurrency())) {
             logger.info("The currency of this transaction is the same. No need to get it from the exchangerate API");
-            exchangeRate = 1.0;
+            exchangeRate = BigDecimal.valueOf(1.0);
         } else {
             logger.info("The currency of this transaction is not the same. Will get the exchange rate from exchangerate API");
             ExchangeRateAPIResponse exchangeRateApiResponse = exchangeRateService.getExchangeRate(fromBankAccount.getCurrency().name());
@@ -78,7 +80,8 @@ public class TransactionService {
                 throw new NoExchangeRateBetweenCurrenciesException(String.format("Exchange rate between %s and %s not found", fromBankAccount.getCurrency().name(), toBankAccount.getCurrency().name()));
             }
 
-            exchangeRate = exchangeRateApiResponse.rates().get(toBankAccount.getCurrency().name());
+            Double exchangeRateResponse = exchangeRateApiResponse.rates().get(toBankAccount.getCurrency().name());
+            exchangeRate = exchangeRateResponse != null ? BigDecimal.valueOf(exchangeRateResponse) : null;
             if(exchangeRate == null){
                 throw new NoExchangeRateBetweenCurrenciesException(String.format("Exchange rate between %s and %s not found", fromBankAccount.getCurrency().name(), toBankAccount.getCurrency().name()));
             }
@@ -87,12 +90,12 @@ public class TransactionService {
         }
 
         // Convert amount in request from "from" Currency into "to" currency
-        double valueToTransfer = exchangeRate * request.amount();
+        BigDecimal valueToTransfer = request.amount().multiply(exchangeRate) ;
 
         logger.info("Executing transaction. Amount: {} with exchange rate of {}. Final value: {} ", request.amount(), exchangeRate, valueToTransfer);
         // Update balance in both accounts
-        fromBankAccount.setBalance(fromBankAccount.getBalance() - request.amount());
-        toBankAccount.setBalance(toBankAccount.getBalance() + valueToTransfer);
+        fromBankAccount.setBalance(fromBankAccount.getBalance().subtract(request.amount()));
+        toBankAccount.setBalance(toBankAccount.getBalance().add(valueToTransfer));
 
         bankAccountRepository.saveAll(List.of(fromBankAccount, toBankAccount));
 

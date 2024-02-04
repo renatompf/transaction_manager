@@ -1,13 +1,14 @@
 package io.renatofreire.transaction_manager.dto;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 public record TransactionDTO(
         Long id,
         AccountTransactionDTO from,
         AccountTransactionDTO to,
-        Double amount,
-        Double exchangeRate,
+        BigDecimal amount,
+        BigDecimal exchangeRate,
         ZonedDateTime timestamp
 ) {
 }
