@@ -1,0 +1,20 @@
+meta {
+  name: CreateNewTransaction
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/transactions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "from": 2,
+    "to": 1,
+    "amount": 300000
+  }
+  
+}

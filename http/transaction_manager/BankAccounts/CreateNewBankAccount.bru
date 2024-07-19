@@ -1,0 +1,19 @@
+meta {
+  name: CreateNewBankAccount
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/bank-accounts
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "currency": "EUR",
+    "balance": 310000,
+    "ownerId": 1
+  }
+}

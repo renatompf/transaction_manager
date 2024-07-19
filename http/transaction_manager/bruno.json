@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "transaction_manager",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
